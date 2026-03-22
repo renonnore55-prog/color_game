@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>カラーバトル / Color Battle</title>
+  <link href="https://fonts.googleapis.com/css2?family=Zen+Dots&family=Noto+Sans+JP:wght@400;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="dot-grid"></div>
+
+<div id="app">
+
+  <!-- ========================================
+       セットアップ画面
+  ======================================== -->
+  <div class="screen active" id="screen-setup">
+    <div class="mt-24 mb-16">
+      <div class="section-label bilingual-center">
+        <span class="jp">新感覚ゲーム!!</span>
+        <span class="en">A Whole New Kind of Game!!</span>
+      </div>
+
+      <div class="game-title bilingual-title">
+        <span class="jp">偏見!!<br>色作り対決!!</span>
+        <span class="en">Bias!!<br>Color Creation Battle!!</span>
+      </div>
+    </div>
+
+    <div class="input-group">
+      <label for="player-count" class="bilingual-label">
+        <span class="jp">プレイ人数（3人以上）</span>
+        <span class="en">Number of Players (3 or more)</span>
+      </label>
+      <input type="number" id="player-count" min="3" max="10" value="3" placeholder="3">
+    </div>
+
+    <div class="input-group">
+      <label for="cycle-count" class="bilingual-label">
+        <span class="jp">サイクル数</span>
+        <span class="en">Number of Cycles</span>
+      </label>
+      <input type="number" id="cycle-count" min="1" max="20" value="2" placeholder="2">
+    </div>
+
+    <div class="flex-1"></div>
+
+    <button class="btn btn-primary bilingual-button" onclick="goToNames()">
+      <span class="jp">次へ → 名前入力</span>
+      <span class="en">Next → Enter Names</span>
+    </button>
+
+    <div style="height:24px"></div>
+  </div>
+
+  <!-- ========================================
+       名前入力画面
+  ======================================== -->
+  <div class="screen" id="screen-names">
+    <div class="mt-16 mb-16">
+      <div class="section-label bilingual-center">
+        <span class="jp">プレイヤー設定</span>
+        <span class="en">Player Setup</span>
+      </div>
+
+      <h2 class="bilingual-heading">
+        <span class="jp">名前を入力してください</span>
+        <span class="en">Please Enter Player Names</span>
+      </h2>
+    </div>
+
+    <div class="name-inputs-container" id="name-inputs"></div>
+
+    <p class="text-muted mb-16 bilingual-center">
+      <span class="jp">↓ スクロールして決定</span>
+      <span class="en">Scroll Down to Confirm</span>
+    </p>
+
+    <button class="btn btn-primary bilingual-button" onclick="startGame()">
+      <span class="jp">最終決定 ゲームスタート！</span>
+      <span class="en">Confirm and Start the Game!</span>
+    </button>
+
+    <div style="height:24px"></div>
+
+    <button class="btn btn-secondary mt-8 bilingual-button" onclick="backToSetup()">
+      <span class="jp">← 戻る</span>
+      <span class="en">← Back</span>
+    </button>
+
+    <div style="height:24px"></div>
+  </div>
+
+  <!-- ========================================
+       ラウンド開始画面
+  ======================================== -->
+  <div class="screen" id="screen-round-intro">
+    <div class="status-bar" id="intro-status"></div>
+
+    <div class="mt-8 mb-8">
+      <div class="section-label bilingual-center">
+        <span class="jp">今回のランキング担当</span>
+        <span class="en">This Round's Ranker Is</span>
+      </div>
+      <div class="pass-name" id="intro-ranker-name"></div>
+    </div>
+
+    <div class="topic-card">
+      <div class="section-label bilingual-center">
+        <span class="jp">お題は...</span>
+        <span class="en">The Topic Is...</span>
+      </div>
+      <div class="topic-text bilingual-topic" id="intro-topic"></div>
+    </div>
+
+    <p class="text-muted mt-8 mb-16 bilingual-paragraph">
+      <span class="jp">色を作るプレイヤーが順番にスマホを持って色を作ります。<br>以下のボタンを押し、最初のプレイヤーにスマホを渡してください。</span>
+      <span class="en">Each player will take turns holding the phone and creating a color.<br>Press the button below and pass the phone to the first player.</span>
+    </p>
+
+    <div class="flex-1"></div>
+
+    <button class="btn btn-primary bilingual-button" onclick="startMakingPhase()">
+      <span class="jp">色作りスタート！</span>
+      <span class="en">Start Creating Colors!</span>
+    </button>
+
+    <div style="height:24px"></div>
+  </div>
+
+  <!-- ========================================
+       スマホ受け渡し画面
+  ======================================== -->
+  <div class="screen" id="screen-pass-to-maker">
+    <div class="pass-screen-inner">
+      <div class="big-emoji">📱</div>
+      <div class="pass-name" id="pass-maker-name"></div>
+
+      <div class="section-label bilingual-center">
+        <span class="jp">がスマホを持っていますか？</span>
+        <span class="en">Has this player received the phone?</span>
+      </div>
+
+      <p class="text-muted bilingual-center">
+        <span class="jp">受け取ってたら下のボタンを押してください</span>
+        <span class="en">If yes, press the button below</span>
+      </p>
+
+      <button class="btn btn-accent3 bilingual-button" onclick="startMakerTimer()" style="margin-top:20px">
+        <span class="jp">スタート！</span>
+        <span class="en">Start!</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- ========================================
+       色作り画面
+  ======================================== -->
+  <div class="screen" id="screen-make-color">
+    <div class="status-bar" id="make-status"></div>
+
+    <div class="topic-card" style="margin-top:0; padding:12px 16px;">
+      <div class="section-label bilingual-center">
+        <span class="jp">お題</span>
+        <span class="en">Topic</span>
+      </div>
+      <div class="topic-text bilingual-topic large-topic" id="make-topic"></div>
+    </div>
+
+    <div class="timer-ring-wrap">
+      <svg class="timer-svg" width="100" height="100" viewBox="0 0 100 100">
+        <circle class="timer-bg" cx="50" cy="50" r="42"/>
+        <circle class="timer-arc" id="timer-arc" cx="50" cy="50" r="42"
+          stroke-dasharray="263.9" stroke-dashoffset="0" stroke="var(--accent3)"/>
+        <text class="timer-text" x="50" y="50" id="timer-text">20</text>
+      </svg>
+    </div>
+
+    <div class="rgb-panel">
+      <div class="color-preview" id="color-preview"></div>
+
+      <div class="slider-row">
+        <span class="slider-label bilingual-inline" style="color:#ff9800; white-space: nowrap; margin-right: 30px;">
+          <span class="jp">H(色相)</span>
+        </span>
+        <input type="range" class="h-slider" id="h-slider" min="0" max="360" value="180" oninput="updateColor()">
+        <span class="slider-val" id="h-val">180</span>
+      </div>
+
+      <div class="slider-row">
+        <span class="slider-label bilingual-inline" style="color:#4caf50; white-space: nowrap; margin-right: 30px;">
+          <span class="jp">S(彩度)</span>
+        </span>
+        <input type="range" class="s-slider" id="s-slider" min="0" max="100" value="50" oninput="updateColor()">
+        <span class="slider-val" id="s-val">50</span>
+      </div>
+
+      <div class="slider-row">
+        <span class="slider-label bilingual-inline" style="color:#2196f3; white-space: nowrap; margin-right: 30px;">
+          <span class="jp">L(明度)</span>
+        </span>
+        <input type="range" class="l-slider" id="l-slider" min="0" max="100" value="50" oninput="updateColor()">
+        <span class="slider-val" id="l-val">50</span>
+      </div>
+
+      <div style="text-align:center; margin-top:10px; color:var(--muted); font-size:0.9rem;">
+        <div id="color-hsl-text">hsl(180, 50%, 50%)</div>
+        <div id="color-rgb-text">rgb(64, 191, 191)</div>
+      </div>
+    </div>
+
+    <button class="btn btn-primary mt-8 bilingual-button" onclick="submitColor()">
+      <span class="jp">この色で決定！</span>
+      <span class="en">Confirm This Color!</span>
+    </button>
+
+    <div style="height:24px"></div>
+  </div>
+
+  <!-- ========================================
+       色保存完了画面
+  ======================================== -->
+  <div class="screen" id="screen-color-submitted">
+    <div class="pass-screen-inner">
+      <div class="big-emoji">🎨</div>
+
+      <h2 class="bilingual-heading" style="text-align:center">
+        <span class="jp">色を保存しました！</span>
+        <span class="en">Color Saved!</span>
+      </h2>
+
+      <div class="color-preview" id="submitted-preview"
+           style="width:140px; height:140px; border-radius:20px; margin:0; border:2px solid var(--border)">
+      </div>
+
+      <p class="text-muted bilingual-center" id="submitted-info"></p>
+      <div id="submitted-next-info" class="bilingual-center" style="margin-top:8px; text-align:center"></div>
+    </div>
+
+    <button class="btn btn-secondary mt-16 bilingual-button" onclick="nextMaker()">
+      <span class="jp">次へ</span>
+      <span class="en">Next</span>
+    </button>
+
+    <div style="height:24px"></div>
+  </div>
+
+  <!-- ========================================
+       ランキング画面
+  ======================================== -->
+  <div class="screen" id="screen-ranking">
+    <div class="status-bar" id="ranking-status"></div>
+
+    <div class="mt-8 mb-8">
+      <div class="section-label bilingual-center">
+        <span class="jp">ランキング付け担当の</span>
+        <span class="en">Pass the phone to the ranker</span>
+      </div>
+
+      <div class="pass-name" id="ranking-ranker-name" style="font-size:2.4rem"></div>
+
+      <div class="section-label bilingual-center">
+        <span class="jp">にスマホを渡してください</span>
+        <span class="en">and let them decide the ranking</span>
+      </div>
+    </div>
+
+    <div class="topic-card" style="margin-top:0; padding:12px 16px;">
+      <div class="section-label bilingual-center">
+        <span class="jp">お題</span>
+        <span class="en">Topic</span>
+      </div>
+      <div class="topic-text bilingual-topic large-topic" id="ranking-topic"></div>
+    </div>
+
+    <p class="text-muted mb-8 bilingual-center">
+      <span class="jp">↕ 色をドラッグして順位を決めてください</span>
+      <span class="en">↕ Drag the colors to decide the ranking</span>
+    </p>
+
+    <div class="draggable-list" id="draggable-colors"></div>
+
+    <div class="flex-1"></div>
+
+    <button class="btn btn-primary mt-16 bilingual-button" onclick="confirmRanking()">
+      <span class="jp">このランキングで決定！</span>
+      <span class="en">Confirm This Ranking!</span>
+    </button>
+
+    <div style="height:24px"></div>
+  </div>
+
+  <template id="ranking-card-template">
+    <div class="draggable-item">
+      <div class="ranking-card-inner">
+        <div class="rank-number"></div>
+        <div class="drag-handle">☰</div>
+        <div class="color-card"></div>
+        <div class="ranking-meta">
+          <div class="ranking-title"></div>
+          <div class="ranking-rgb"></div>
+        </div>
+      </div>
+    </div>
+  </template>
+
+  <!-- ========================================
+       ラウンド結果画面
+  ======================================== -->
+  <div class="screen" id="screen-round-result">
+    <div class="status-bar" id="result-status"></div>
+
+    <div class="mt-8 mb-16">
+      <h2 class="bilingual-heading">
+        <span class="jp">ラウンド結果</span>
+        <span class="en">Round Results</span>
+      </h2>
+    </div>
+
+    <div id="round-result-list"></div>
+
+    <div class="divider"></div>
+
+    <div class="section-label mb-8 bilingual-center">
+      <span class="jp">現在の総合スコア</span>
+      <span class="en">Current Total Scores</span>
+    </div>
+
+    <div class="score-list" id="current-scores"></div>
+
+    <div class="flex-1"></div>
+
+    <button class="btn btn-primary mt-16 bilingual-button" id="next-round-btn" onclick="nextRound()">
+      <span class="jp">次へ</span>
+      <span class="en">Next</span>
+    </button>
+
+    <div style="height:24px"></div>
+  </div>
+
+  <!-- ========================================
+       最終結果画面
+  ======================================== -->
+  <div class="screen" id="screen-final">
+    <div class="mt-24 mb-8 text-center">
+      <div class="game-title bilingual-title final-title">
+        <span class="jp">ゲーム<br>終了！</span>
+        <span class="en">GAME<br>FINISH!</span>
+      </div>
+    </div>
+
+    <div class="topic-card" style="margin: 12px 0;">
+      <div class="section-label bilingual-center">
+        <span class="jp">最終結果発表</span>
+        <span class="en">Final Results</span>
+      </div>
+
+      <div class="topic-text" id="winner-name" style="font-size:1.8rem"></div>
+
+      <p class="winner-caption bilingual-center" style="color:var(--muted); font-size:0.8rem; margin-top:4px">
+        <span class="jp">の優勝！</span>
+        <span class="en">is the winner!</span>
+      </p>
+    </div>
+
+    <div class="score-list" id="final-scores"></div>
+
+    <div class="flex-1"></div>
+
+    <button class="btn btn-secondary mt-16 bilingual-button" onclick="resetGame()">
+      <span class="jp">もう一度プレイ</span>
+      <span class="en">Play Again</span>
+    </button>
+
+    <button class="btn btn-primary mt-8 bilingual-button" onclick="exportLogsAsCSV()">
+      <span class="jp">ログをCSV保存</span>
+      <span class="en">Export Logs as CSV</span>
+    </button>
+
+    <div style="height:24px"></div>
+  </div>
+
+</div>
+
+<script src="game.js"></script>
+</body>
+</html>
