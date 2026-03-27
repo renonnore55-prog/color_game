@@ -369,19 +369,18 @@
 
     <div class="flex-1"></div>
 
-    <button class="btn btn-secondary mt-16 bilingual-button" onclick="resetGame()">
+    <button class="btn btn-secondary mt-16 bilingual-button" onclick="handlePlayAgain()">
       <span class="jp">もう一度プレイ</span>
       <span class="en">Play Again</span>
     </button>
 
-    <button class="btn btn-primary mt-8 bilingual-button" onclick="exportLogsAsCSV()">
-      <span class="jp">ログをCSV保存</span>
-      <span class="en">Export Logs as CSV</span>
+    <button class="btn btn-primary mt-8 bilingual-button" onclick="handleEndGame()">
+      <span class="jp">ゲームを終了</span>
+      <span class="en">End Game</span>
     </button>
 
     <div style="height:24px"></div>
-  </div>
-
+ </div>
 </div>
 
 <script src="game.js"></script>

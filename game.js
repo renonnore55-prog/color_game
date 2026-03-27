@@ -736,3 +736,54 @@ function exportLogsAsCSV() {
   link.click();
   URL.revokeObjectURL(url);
 }
+
+
+// 1. サーバー（GAS）にデータを送る純粋な関数
+
+async function sendLogsToGAS() {
+  const GAS_URL = "https://script.google.com/macros/s/AKfycbwN2_BV7LWc-EQO0XMTnvdCl0dMyKb4H2RXVTPN0zuo0RpqkTXJvQ2RHT7TNRD5pvln/exec"; 
+
+  const logs = state.answerLogs.map(log => ({
+    cycle: log.cycle,
+    round: log.round,
+    topic: log.topic,
+    playerName: log.playerName,
+    r: log.rgb.r,
+    g: log.rgb.g,
+    b: log.rgb.b,
+    answerTime: log.answerTime,
+    rank: log.rank
+  }));
+
+  try {
+    // 応答を待たずに送信だけ確実に実行
+    await fetch(GAS_URL, {
+      method: "POST",
+      mode: "no-cors", // GASへの送信でよく使われる設定
+      body: JSON.stringify(logs)
+    });
+    console.log("Data sent successfully");
+  } catch (error) {
+    console.error("Data transmission failed", error);
+  }
+}
+
+// 2. 「もう一度プレイ」ボタンの処理
+async function handlePlayAgain() {
+  // 送信が終わるまで一応待つ（あるいは並列で走らせる）
+  await sendLogsToGAS();
+  // 既存のリセット処理を実行
+  resetGame(); 
+}
+
+// 3. 「ゲームを終了」ボタンの処理
+async function handleEndGame() {
+  await sendLogsToGAS();
+  
+  // サイトを閉じる試行
+  window.close();
+  
+  // ブラウザのセキュリティ制限で閉じられない場合の保険
+  // （ユーザーが直接URLを叩いて開いたページはスクリプトで閉じられないため）
+  alert("プレイありがとうございました！タブを閉じて終了してください。");
+}
