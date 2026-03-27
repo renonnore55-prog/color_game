@@ -829,3 +829,20 @@ input[type="range"]::-moz-range-thumb {
   }
 }
 
+.draggable-item {
+  /* テキスト選択を禁止（ドラッグしやすくする） */
+  -webkit-user-select: none;
+  user-select: none;
+
+  /* 指で触れた時のデフォルト挙動を制限 */
+  /* manipulationにすると、スクロールはできるがダブルタップズームなどが抑制される */
+  touch-action: manipulation;
+  
+  /* ユーザーが「掴める」と直感的にわかるようにする（PC用） */
+  cursor: grab;
+}
+
+/* ドラッグ中のスタイル（既にあるものに追記） */
+.dragging {
+  opacity: 0.5;
+}
